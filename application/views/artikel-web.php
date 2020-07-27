@@ -143,6 +143,10 @@
 
 
             for(var i =0; i < data.data.length; i++){
+              var hr_k = document.createElement("hr");
+
+              i_komen.appendChild(hr_k);
+
               var media = document.createElement("div");
               media.setAttribute("class", "media");
               i_komen.appendChild(media);
@@ -161,6 +165,7 @@
               media_body.appendChild(p_k);
 
               var b_k = document.createElement("b");
+              b_k.textContent = "Dari : ";
               p_k.appendChild(b_k);
               var i_k = document.createElement("i");
               i_k.textContent = data.data[i]["inisial"];
@@ -169,13 +174,20 @@
               var hr_u = document.createElement("hr");
               media_body.appendChild(hr_u);
 
-              var p_i = document.createElement("p");
+              var p_i = document.createElement("div");
+              p_i.setAttribute("class", "jumbotron");
+              p_i.setAttribute("style", "padding:5px;min-height:150px;");
               p_i.textContent = data.data[i]["komentar"];
               media_body.appendChild(p_i);
 
-              var hr_k = document.createElement("hr");
+              var hr_i = document.createElement("hr");
+              media_body.appendChild(hr_i);
 
-              i_komen.appendChild(hr_k);
+
+              var div_tgl = document.createElement("div");
+              div_tgl.innerHTML = "<i class='fa fa-calendar'></i> "+data.data[i]["tgl_kirim"]+" <i class='fa fa-clock-o'></i> "+data.data[i]["jam"];
+              media_body.appendChild(div_tgl)
+              
             }
           } else {
             alert("OK");
@@ -191,15 +203,20 @@
           if($komentar->status == true){
             foreach ($komentar->data as $key => $value) {
               ?>
+                <hr>
                 <div class="media">
                   <img src="//<?php echo base_url("assets/images/user.png"); ?>" class="mr-3" alt="Komentar" style="width: 100px;height: 100px;">
                   <div class="media-body">
-                    <p><b><i><?=$value["inisial"]?></i></b></p>
+                    <p><b>Dari : <i><?=$value["inisial"]?></i></b></p>
                     <hr>
-                    <p><?=$value["komentar"]?></p>
+                    <div class="jumbotron" style="padding: 10px;min-height: 150px;"><?=$value["komentar"]?></div>
+                    <hr>
+                    <div>
+                      <i class="fa fa-calendar"></i> <?=$value["tgl_kirim"] ?> <i class="fa fa-clock-o"></i> <?=$value["jam"] ?>
+                    </div>
                   </div>
                 </div>
-                <hr>
+                
               <?php
             }
           } else {
@@ -210,6 +227,9 @@
          ?>
       </div>
 
+      <br>
+
+      <hr>
       <h3 class="display-4" style="font-size: 20px;"><b><i>Artikel yang berkaitan.....</i></b></h3>
       <hr>
     <div class="container">
