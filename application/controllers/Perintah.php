@@ -101,6 +101,7 @@ class Perintah extends CI_Controller
 		if($this->session->userdata('username')){
 		    $this->session->unset_userdata('username');
 		    $this->session->unset_userdata('role');
+		    $this->session->unset_userdata('email');
 
 		    // Set message
 		    $this->session->set_flashdata('logout', 'You are now logged out');
@@ -621,6 +622,41 @@ class Perintah extends CI_Controller
 			$output->message = "Anda ngapain ngasih nilai array hah ?!";
 		}
 
+		$this->output
+		->set_content_type("application/json")
+		->set_output(json_encode($output));
+
+	}
+
+	public function submit_email_user(){
+		$output = (object)array();
+		$inisial = $this->input->post("inisial");
+		$ip = $this->input->ip_address();
+		if($ip == "::1"){
+			$ip = "127.0.0.1";
+		}
+
+		if(is_array($inisial) != true){
+			if(strlen($inisial) >= 5){
+				if(filter_var($inisial, FILTER_VALIDATE_EMAIL)){
+					$output = $this->md->submit_email($ip, $inisial);
+					if($output->status == true){
+						$this->session->set_userdata(array(
+							"email" => $inisial
+						));
+					}
+				} else {
+					$output->status = false;
+					$output->message = "Kolom harus berupa email!";
+				}
+			} else {
+				$output->status = false;
+				$output->message = "Form tidak boleh kosong!, Minimal isi 5 karakter.";
+			}
+		} else {
+			$output->status = false;
+			$output->message = "Anda ngapain ngasih nilai array hah ?!";
+		}
 		$this->output
 		->set_content_type("application/json")
 		->set_output(json_encode($output));

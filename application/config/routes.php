@@ -57,6 +57,7 @@ $route["tags/(:num)/(:any)/page/(:num)"] = 'xinterface/tag/$1/$2/$3';
 $route["kategori/(:num)/(:any)"] = 'xinterface/kategori/$1/$2';
 $route["kategori/(:num)/(:any)/page/(:num)"] = 'xinterface/kategori/$1/$2/$3';
 $route["kirim/komentar/(:num)"] = 'perintah/komen/$1';
+$route["submit_email"] = 'perintah/submit_email_user';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

@@ -635,7 +635,7 @@ class Middleware extends CI_Model
 				));
 			} else {
 				$output->status = false;
-				$output->message = "Ada kesalahan saat memposting komentar, silahkan hubungi admin! Error db : '".$input_db->err["message"]."'";
+				$output->message = "Ada kesalahan saat memposting komentar, silahkan hubungi admin! \nError db : '".$input_db->err["message"]."'";
 			}
 		}
 
@@ -660,6 +660,23 @@ class Middleware extends CI_Model
 
 		return $output;
 
+	}
+
+	public function submit_email($ip, $inisial){
+		$output = (object)array();
+		$insert = $this->dba->insert("pengunjung", array(
+			"ip" => $ip,
+			"email" => $inisial
+		));
+
+		if($insert->err["code"] == 0){
+			$output->status = true;
+			$output->message = "Submit email sukses!";
+		} else {
+			$output->status = false;
+			$output->message = "Ada masalah pada database! \nError Database : ".$insert->err["message"];
+		}
+		return $output;
 	}
 
 

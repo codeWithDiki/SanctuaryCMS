@@ -64,13 +64,13 @@
           <hr>
           <div class="row" align="center">
             <div class="col">
-              <a class="btn btn-block btn-outline-success">  
-                <span class="badge badge-success"><?=$value["jml_like"]?></span>  Suka
+              <a class="btn btn-block btn-outline-success" id="btn-like" onclick="like_dislike('like', <?=$id_artikel?>)">  
+                <span class="badge badge-success" id="jml-like"><?=$value["jml_like"]?></span>  Suka
               </a>
             </div>
             <div class="col">
-              <a class="btn btn-block btn-outline-danger">
-                <span class="badge badge-danger"><?=$value["jml_dislike"]?></span>  Tidak Suka
+              <a class="btn btn-block btn-outline-danger" id="btn-dislike" onclick="like_dislike('like', <?=$id_artikel?>)">
+                <span class="badge badge-danger" id="jml-dislike"><?=$value["jml_dislike"]?></span>  Tidak Suka
               </a>
             </div>
           </div>
@@ -104,6 +104,7 @@
       </form>
 
       <script type="text/javascript">
+        var check = <?php if($this->session->has_userdata("email")){ echo "true"; } else { echo "false"; } ?>;
         $("#komentar").submit(function(e){
           var notifi = document.getElementById("alert-komentar");
           e.preventDefault();
@@ -122,6 +123,7 @@
               notifi.innerHTML = null;
               if(output.status === true){
                 notifi.setAttribute("class", "alert alert-success");
+                check = true;
               } else {
                 notifi.setAttribute("class", "alert alert-danger");
               }
@@ -131,6 +133,127 @@
             }
           });
         });
+
+
+
+        function like_dislike(fungsi, id){
+          var modal = document.getElementById("prop_modal");
+          var modal_header = document.getElementById("modal-header");
+          var modal_body = document.getElementById("modal-body");
+          var modal_footer = document.getElementById("modal-footer");
+          var btn_like = document.getElementById("btn-like");
+          var jml_like = document.getElementById("jml-like");
+          var btn_dislike = document.getElementById("btn-dislike");
+          var jml_dislike = document.getElementById("jml-dislike");
+
+          $(modal).on('hidden.bs.modal', function (e) {
+            modal_header.innerHTML = null;
+            modal_body.innerHTML = null;
+            modal_footer.innerHTML= null;
+          });
+
+
+          
+
+          if(check === true){
+            
+            $.ajax({
+              url: "//<?=base_url("like/".$id_artikel) ?>",
+              type: "POST",
+              beforeSend: function(){
+                $(btn_like).addClass("disabled");
+                $(btn_dislike).addClass("disabled");
+              },
+              success: function(output){
+
+              }
+            });
+          } else {
+            $(modal).modal("show");
+            modal_header.textContent = "Perhatian!";
+
+            var p = document.createElement("p");
+            p.textContent = "Sebelum itu mohon untuk memasukan email terlebih dahulu ya :), guna pendataan terhadap like dan dislike untuk artikel ini, dan setelah mengisi form ini anda tidak perlu melakukan pengisian form diartikel lain, terimakasih ^^";
+            modal_body.appendChild(p);
+            var hr = document.createElement("hr");
+            modal_body.appendChild(hr);
+
+
+            var form = document.createElement("form");
+
+            modal_body.appendChild(form);
+
+            var group1 = document.createElement("div");
+            group1.setAttribute("class", "form-group");
+            form.appendChild(group1);
+
+            var label = document.createElement("label");
+            label.textContent = "Email : ";
+            group1.appendChild(label);
+
+            var input = document.createElement("input");
+            input.setAttribute("class", "form-control");
+            input.setAttribute("name", "inisial");
+            input.setAttribute("type", "email");
+            input.setAttribute("maxlength", "50");
+            group1.appendChild(input);
+
+            var btn_submit = document.createElement("button");
+            btn_submit.setAttribute("class", "btn btn-success");
+            btn_submit.textContent = "Kirim";
+            form.appendChild(btn_submit);
+
+            var notifi = document.createElement("div");
+            notifi.setAttribute("align", "center");
+            notifi.setAttribute("style", "margin-top:10px;");
+
+            var loader = document.createElement("i");
+            loader.setAttribute("class", "fa fa-spinner fa-pulse");
+            modal_body.appendChild(notifi);
+
+            var form_inisial = document.getElementById("inisial");
+
+
+
+            form.addEventListener("submit", function(e){
+              e.preventDefault();
+              $.ajax({
+                url: "//<?=base_url("submit_email") ?>",
+                type: "POST",
+                data: $(form).serializeArray(),
+                beforeSend: function(){
+                  input.setAttribute("disabled", true);
+                  btn_submit.setAttribute("disabled", true);
+                  notifi.innerHTML = null;
+                  notifi.removeAttribute("class");
+                  notifi.appendChild(loader);
+                },
+                success: function(output){
+                  if(output.status){
+                    $(modal).modal("hide");
+                    form_inisial.value = output.email;
+                    form_inisial.setAttribute("readonly", "true");
+                    check = true;
+                    like_dislike(fungsi, id);
+                  } else {
+                    input.removeAttribute("disabled");
+                    btn_submit.removeAttribute("disabled");
+                    notifi.innerHTML = null;
+                    notifi.setAttribute("class", "alert alert-danger");
+                    notifi.textContent = output.message;
+                  }
+                }
+              });
+            });
+
+            modal_footer.textContent = "SanctuaryCMS V.0.1";
+
+          }
+
+
+
+        }
+
 
         function refresh_komentar(data = false){
           if(data != false){
